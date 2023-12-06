@@ -1,5 +1,4 @@
 import System.IO
-import Control.Monad
 import Data.Char
 
 main :: IO ()
