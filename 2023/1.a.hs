@@ -37,9 +37,9 @@ normaliseGame = foldr (join . normaliseHandful) (RBG 0 0 0)
 
 stringToCube :: String -> Cube
 stringToCube xs = case reverse xs of
-    ('d':'e':'r':' ':xs)         -> R (head [ n | n <- [0..], reverse xs == show n])
-    ('e':'u':'l':'b':' ':xs)     -> B (head [ n | n <- [0..], reverse xs == show n])
-    ('n':'e':'e':'r':'g':' ':xs) -> G (head [ n | n <- [0..], reverse xs == show n]) -- (read (reverse xs) :: Int)
+    ('d':'e':'r':' ':xs)         -> R (read (reverse xs) :: Int)
+    ('e':'u':'l':'b':' ':xs)     -> B (read (reverse xs) :: Int)
+    ('n':'e':'e':'r':'g':' ':xs) -> G (read (reverse xs) :: Int)
 
 stringToHandful :: String -> Handful
 stringToHandful [] = []
