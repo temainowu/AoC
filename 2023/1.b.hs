@@ -5,29 +5,16 @@ data Cube = R Int | B Int | G Int
 type Handful = [Cube]
 type Game = [Handful]
 
-data NormalHandful = RBG Int Int Int | X
+data NormalHandful = RBG Int Int Int
     deriving (Eq, Show)
-
-bag = RBG 12 14 13
 
 addHand :: Cube -> NormalHandful -> NormalHandful
 addHand (R n) (RBG a b c) = RBG (a + n) b c
 addHand (B n) (RBG a b c) = RBG a (b + n) c
 addHand (G n) (RBG a b c) = RBG a b (c + n)
 
-filterHand :: (NormalHandful -> Bool) -> [NormalHandful] -> [NormalHandful]
-filterHand f [] = []
-filterHand f (x:xs) | f x = x : filterHand f xs
-                    | otherwise = X : filterHand f xs
-
-handToIndex :: [NormalHandful] -> [Int]
-handToIndex xs = [ i | (i,x) <- zip [1..] xs, x /= X]
-
 join :: NormalHandful -> NormalHandful -> NormalHandful
 join (RBG a b c) (RBG a' b' c') = RBG (max a a') (max b b') (max c c')
-
-less :: NormalHandful -> NormalHandful -> Bool
-less (RBG a b c) (RBG a' b' c') = a <= a' && b <= b' && c <= c'
 
 normaliseHandful :: Handful -> NormalHandful
 normaliseHandful = foldr addHand (RBG 0 0 0)
