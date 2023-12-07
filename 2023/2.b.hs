@@ -2,13 +2,19 @@ import System.IO
 import Data.Char
 import Control.Monad
 
+(!) :: [[a]] -> (Int,Int) -> a
+[[x]] ! (0,0) = x
+[x:xs] ! (0,j) | j > 0 = [xs] ! (0,j-1)
+(xs:xss) ! (i,j) | i > 0 = xss ! (i-1,j)
+(xs:xss) ! (0,j) = [xs] ! (0,j)
+
 data Things = O | X | N Int
     deriving (Eq, Show  )
 
 data Gear = G | NG
     deriving (Eq, Show)
 
-data ShowK = K [[(Things,Gear)]] | L [[Things]] 
+data ShowK = K [[(Things,Gear)]] | L [[Things]]
 
 instance Show ShowK where
     show (K []) = []
@@ -60,7 +66,7 @@ pad' xs = map (((O,NG) :) . (++ [(O,NG)])) (row : xs ++ [row])
         row = replicate (length (head xs)) (O,NG)
 
 neighbours :: [[Things]] -> Int -> Int -> [Things]
-neighbours xss i j = [ xss !! (i + x) !! (j + y) | x <- [-1..1], y <- [-1..1], x /= 0 || y /= 0 ]
+neighbours xss i j = [ xss ! (i + x, j + y) | x <- [-1..1], y <- [-1..1], x /= 0 || y /= 0 ]
 
 triples :: [a] -> [(a,a,a)]
 triples (a:b:c:xs) = (a,b,c) : triples (b:c:xs)
@@ -107,6 +113,13 @@ g' (x0:x1:x2:xs,y0:y1:y2:ys,z0:z1:z2:zs) | isN (fst y1) && ((X,G) `elem` [x0,x1,
 g' (_,y0:y1:ys,_) = [y1]
 g' ([],[],[]) = []
 
-main :: IO ShowK
+getNums :: [[Things]] -> [((Int,Int),Int)]
+getNums xss = zip coords (map (sum . map thingToInt . takeWhile isN . \(i,j) -> drop i (xss !! j)) coords)
+    where coords = [ (i,j) | i <- [0..length xss - 1], j <- [0..length (head xss) - 1], isN (xss ! (i,j)) && not (isN (xss ! (i, j-1))) ]
+
+pairNumsAroundGears :: [[Things]] -> [(Int,Int)]
+pairNumsAroundGears xss = undefined
+
+main :: IO [((Int,Int),Int)]
 main = openFile "2.i.txt" ReadMode >>= (hGetContents >=>
-     (return . (L . f . map represent . lines)))
+     (return . (getNums . f . map represent . lines)))
