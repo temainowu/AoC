@@ -8,6 +8,9 @@ type Game = [Handful]
 data NormalHandful = RBG Int Int Int | X
     deriving (Eq, Show)
 
+instance Ord NormalHandful where
+    compare (RBG a b c) (RBG a' b' c') = compare (a,b,c) (a',b',c')
+
 bag = RBG 12 14 13
 
 addHand :: Cube -> NormalHandful -> NormalHandful
@@ -25,9 +28,6 @@ handToIndex xs = [ i | (i,x) <- zip [1..] xs, x /= X]
 
 join :: NormalHandful -> NormalHandful -> NormalHandful
 join (RBG a b c) (RBG a' b' c') = RBG (max a a') (max b b') (max c c')
-
-less :: NormalHandful -> NormalHandful -> Bool
-less (RBG a b c) (RBG a' b' c') = a <= a' && b <= b' && c <= c'
 
 normaliseHandful :: Handful -> NormalHandful
 normaliseHandful = foldr addHand (RBG 0 0 0)
@@ -52,5 +52,5 @@ stringToGame (_:xs) = (\(xs,ys) -> stringToHandful (',':xs) : stringToGame ys) (
 main :: IO ()
 main = openFile "1.i.txt" ReadMode >>= \handle ->
        hGetContents handle >>= \contents ->
-       print (sum (handToIndex (filterHand (`less` bag) (map (normaliseGame . stringToGame . dropWhile (/= ':')) (lines contents))))) >>
+       print (sum (handToIndex (filterHand (<= bag) (map (normaliseGame . stringToGame . dropWhile (/= ':')) (lines contents))))) >>
        hClose handle
