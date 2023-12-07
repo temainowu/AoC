@@ -1,10 +1,10 @@
 import System.IO
 
-f :: String -> IO ()
+f :: [String] -> a
 f = undefined
 
 main :: IO ()
 main = openFile "n.i.txt" ReadMode >>= \handle -> 
        hGetContents handle >>= \contents ->
-       f contents >>
+       print (f (lines contents)) >>
        hClose handle
