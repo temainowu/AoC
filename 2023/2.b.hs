@@ -3,10 +3,7 @@ import Data.Char
 import Control.Monad
 
 (!) :: [[a]] -> (Int,Int) -> a
-[[x]] ! (0,0) = x
-[x:xs] ! (0,j) | j > 0 = [xs] ! (0,j-1)
-(xs:xss) ! (i,j) | i > 0 = xss ! (i-1,j)
-(xs:xss) ! (0,j) = [xs] ! (0,j)
+xss ! (i,j) = xss !! i !! j
 
 data Things = O | X | N Int
     deriving (Eq, Show  )
@@ -17,17 +14,17 @@ data Gear = G | NG
 data ShowK = K [[(Things,Gear)]] | L [[Things]]
 
 instance Show ShowK where
-    show (K []) = []
-    show (K ([]:xss)) = '\n' : show (K xss)
-    show (K (((O,NG):xs):xss)) = '.' : show (K (xs:xss))
-    show (K (((X,NG):xs):xss)) = '.' : show (K (xs:xss))
-    show (K (((X,G):xs):xss)) = '*' : show (K (xs:xss))
-    show (K (((N n,NG):xs):xss)) = '.' : show (K (xs:xss))
-    show (K (((N n,G):xs):xss)) = head (show n) : show (K (xs:xss))
-    show (L []) = []
-    show (L ([]:xss)) = '\n' : show (L xss)
-    show (L ((O:xs):xss)) = '.' : show (L (xs:xss))
-    show (L ((X:xs):xss)) = '*' : show (L (xs:xss))
+    show (K [])                  = []
+    show (K ([]:xss))            = '\n'          : show (K xss)
+    show (K (((O,NG):xs):xss))   = '.'           : show (K (xs:xss))
+    show (K (((X,NG):xs):xss))   = '.'           : show (K (xs:xss))
+    show (K (((X,G):xs):xss))    = '*'           : show (K (xs:xss))
+    show (K (((N n,NG):xs):xss)) = '.'           : show (K (xs:xss))
+    show (K (((N n,G):xs):xss))  = head (show n) : show (K (xs:xss))
+    show (L [])             = []
+    show (L ([]:xss))       = '\n'          : show (L xss)
+    show (L ((O:xs):xss))   = '.'           : show (L (xs:xss))
+    show (L ((X:xs):xss))   = '*'           : show (L (xs:xss))
     show (L ((N n:xs):xss)) = head (show n) : show (L (xs:xss))
 
 isN :: Things -> Bool
@@ -90,14 +87,14 @@ one f xs = any f xs && not (all (any f) (removes xs))
 
 g :: ([Things],[Things],[Things]) -> [(Things,Gear)]
 g (x0:x1:x2:xs,y0:y1:y2:ys,z0:z1:z2:zs) | y1 == X && (
-                                          (isN x0 && (one isN [x2,y0,y2,z0,z1,z2] || (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1))))) ||
-                                          (isN x1 && (one isN [y0,y2,z0,z1,z2] || (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1))))) ||
-                                          (isN x2 && (one isN [x0,y0,y2,z0,z1,z2] || (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1))))) ||
+                                          (isN x0 && (one isN [x2,y0,y2,z0,z1,z2]    ||  (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1))))) ||
+                                          (isN x1 && (one isN [y0,y2,z0,z1,z2]       ||  (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1))))) ||
+                                          (isN x2 && (one isN [x0,y0,y2,z0,z1,z2]    ||  (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1))))) ||
                                           (isN y0 && (one isN [x0,x1,x2,y2,z0,z1,z2] || ((any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1))) /= (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1)))))) ||
                                           (isN y2 && (one isN [x0,x1,x2,y0,z0,z1,z2] || ((any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1))) /= (any isN [z0,z1,z2] && not (isN z0 && isN z2 && not (isN z1)))))) ||
-                                          (isN z0 && (one isN [x0,x1,x2,y0,y2,z2] || (any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1))))) ||
-                                          (isN z1 && (one isN [x0,x1,x2,y0,y2] || (any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1))))) ||
-                                          (isN z2 && (one isN [x0,x1,x2,y0,y2,z0] || (any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1)))))
+                                          (isN z0 && (one isN [x0,x1,x2,y0,y2,z2]    ||  (any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1))))) ||
+                                          (isN z1 && (one isN [x0,x1,x2,y0,y2]       ||  (any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1))))) ||
+                                          (isN z2 && (one isN [x0,x1,x2,y0,y2,z0]    ||  (any isN [x0,x1,x2] && not (isN x0 && isN x2 && not (isN x1)))))
                                                             ) = (X, G) : next y1
                                         | otherwise = (y1, NG) : next y1
     where
