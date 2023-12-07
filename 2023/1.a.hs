@@ -49,11 +49,8 @@ stringToGame :: String -> Game
 stringToGame [] = []
 stringToGame (_:xs) = (\(xs,ys) -> stringToHandful (',':xs) : stringToGame ys) (break (== ';') xs)
 
-dropGameNo :: String -> String
-dropGameNo = (';':) . tail . dropWhile (/= ':')
-
 main :: IO ()
 main = openFile "1.i.txt" ReadMode >>= \handle ->
        hGetContents handle >>= \contents ->
-       print (sum (handToIndex (filterHand (`less` bag) (map (normaliseGame . stringToGame . dropGameNo) (lines contents))))) >>
+       print (sum (handToIndex (filterHand (`less` bag) (map (normaliseGame . stringToGame . dropWhile (/= ':')) (lines contents))))) >>
        hClose handle
